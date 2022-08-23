@@ -1,0 +1,50 @@
+server:
+  servlet:
+    context-path: /student/placement/portal
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~ sharding sphere start ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+spring:
+  application:
+    name: studentPlacementPortal
+  shardingsphere:
+    props:
+      sql:
+        show: true
+    sharding:
+      tables:
+        pp_user_register:
+          actual-data-nodes: pp$->{0..1}.pp_user_register_$->{0..2}
+          table-strategy:
+            complex:
+              sharding-columns: user_id
+              algorithm-class-name: com.student.placement.portal.dao.sharding.TableShardingAlgorithm
+          database-strategy:
+            complex:
+              sharding-columns: merchant_id
+              algorithm-class-name: com.student.placement.portal.dao.sharding.DataBaseShardingAlgorithm
+    datasource:
+      names: pp0,pp1
+      pp0:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbcUrl: jdbc:mysql://${DS0_JDBC_URL:localhost:3306}/pp0
+        username: ${DS0_JDBC_USER:root}
+        password: ${DS0_JDBC_PASSWD:password}
+        max-lifetime: ${HIKARI_MAX_LIFETIME:60000} # maximum lifetime in milliseconds of a connection in the pool after it is closed.
+        idle-timeout: ${HIKARI_IDLE_TIMEOUT:10000} # maximum idle time for connection
+        minimum-idle: ${HIKARI_MIN_IDLE:10} # minimum number of idle connections maintained by HikariCP in a connection pool'
+        connection-timeout: ${HIKARI_CONNECTION_TIMEOUT:20000} # maximum number of milliseconds that a client will wait for a connection
+        maximum-pool-size: ${HIKARI_MAX_POOL_SIZE:10} # maximum pool size
+
+      pp1:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbcUrl: jdbc:mysql://${DS1_JDBC_URL:localhost:3306}/pp1
+        username: ${DS1_JDBC_USER:root}
+        password: ${DS1_JDBC_PASSWD:password}
+        max-lifetime: ${HIKARI_MAX_LIFETIME:60000} # maximum lifetime in milliseconds of a connection in the pool after it is closed.
+        idle-timeout: ${HIKARI_IDLE_TIMEOUT:10000} # maximum idle time for connection
+        minimum-idle: ${HIKARI_MIN_IDLE:10} # minimum number of idle connections maintained by HikariCP in a connection pool'
+        connection-timeout: ${HIKARI_CONNECTION_TIMEOUT:20000} # maximum number of milliseconds that a client will wait for a connection
+        maximum-pool-size: ${HIKARI_MAX_POOL_SIZE:10} # maximum pool size
